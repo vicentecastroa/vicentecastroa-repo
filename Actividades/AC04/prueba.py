@@ -1,7 +1,15 @@
 __author__ = 'Vicente'
 
-a="7679,-9626,9126,-6320,Ruby".split(',')
-print(a[:4])
+def gen_id(numero):
+    while True:
+        yield numero
+        numero +=1
 
-for i in range(int('2')):
-    print(i)
+
+def leer_linea(archivo):
+    with open(archivo, 'r'):
+        yield linea in archivo
+
+linea = leer_linea('../AC06/Reporte.txt')
+
+print(next(linea))

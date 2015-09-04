@@ -1,8 +1,5 @@
 __author__ = 'Vicente'
 
-class Clase:
-    pass
-
 class Evaluacion:
 
     def __init__(self, sigla='', sec='',fecha='',tipo=''):
@@ -12,4 +9,4 @@ class Evaluacion:
         self.tipo = tipo
 
     def __repr__(self):
-        return "evaluacion {} {}".format(self.sigla, self.tipo)
+        return "Dia: {}  |  {}-{}".format(self.fecha, self.tipo, self.sigla)

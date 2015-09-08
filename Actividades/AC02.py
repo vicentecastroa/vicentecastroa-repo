@@ -10,8 +10,6 @@ class Audifono:
     def escuchar(self, cancion):
         print("la cancion "+cancion+" esta siendo reproducida desde un audifono")
 
-
-
 class OverEar(Audifono):
     def __init__(self, aislacion='', **kwargs):
         super().__init__(**kwargs)

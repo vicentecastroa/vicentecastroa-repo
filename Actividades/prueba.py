@@ -21,3 +21,12 @@ def saludar(objeto, sujeto):
     print("hola {}, soy {}").format(objeto, sujeto)
 
 saludar('perro', 'vicente')
+
+
+'''# revisa si son todos los tipos iguales
+    tipo_anterior = tipos[0]
+    for tipo in tipos:
+        if tipo != tipo_anterior:
+            return print("ERROR")
+        tipo_anterior = tipo
+    tipo = tipo_anterior'''

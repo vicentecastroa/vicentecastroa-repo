@@ -9,7 +9,6 @@ def tipar(*tipos):
                 if not isinstance(elemento, tipos[i]):
                     return print("ERROR")
                 i += 1
-                
             return suma_gen(*args)
         return chequeo
     return decorador

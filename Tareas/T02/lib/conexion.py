@@ -22,10 +22,3 @@ class Conexion:
 
     def __repr__(self):
         return "CONEXION desde {}".format(self.desde)
-
-
-a = Conexion(3, 6)
-a.agregar_destino(9)
-a.agregar_destino(10)
-a.agregar_destino(11)
-a.agregar_destino(12)

@@ -11,7 +11,6 @@ class ListaPuertos:  # Se inicializa con el puerto inicial 0
 
     def agregar_puerto(self, puerto):
         if not self.buscar_puerto(puerto.id):
-            a = self.ultimo
             self.ultimo.agregar_hijo(puerto)
             puerto.agregar_padre(self.ultimo)
             self.ultimo = puerto
@@ -30,8 +29,7 @@ class ListaPuertos:  # Se inicializa con el puerto inicial 0
         if actual.id == id:
             return actual
         else:
-            for i in range(actual.hijos.cantidad_puertos):
-                hijo = actual.hijos.get(i)
+            for hijo in actual.hijos:
                 hijo.hijos.buscar_puerto(id)
         return False
 
@@ -40,25 +38,23 @@ class Puerto:
     def __init__(self, id):
         self.id = id
         self.visitas = 0
-        self.hijos = ListaPuertos()
-        self.padres = ListaPuertos()
+        self.hijos = datos.Lista()
+        self.padres = datos.Lista()
         self.conexiones = datos.Lista()
 
     def agregar_hijo(self, puerto_hijo):
-        cantidad_hijos = self.hijos.cantidad_puertos
-        if cantidad_hijos == 0:
+        if self.hijos.largo == 0:
             self.hijos.primero = puerto_hijo
             self.hijos.cantidad_puertos = 1
         else:
-            self.hijos.agregar_puerto(puerto_hijo)
+            self.hijos.add(puerto_hijo)
 
     def agregar_padre(self, puerto_padre):
-        cantidad_padres = self.padres.cantidad_puertos
-        if cantidad_padres == 0:
+        if self.padres.largo == 0:
             self.padres.primero = puerto_padre
             self.hijos.cantidad_puertos = puerto_padre
         else:
-            self.padres.agregar_puerto(puerto_padre)
+            self.padres.add(puerto_padre)
 
     def agregar_conexion(self, conexion):
         conexion = datos.Nodo(conexion)

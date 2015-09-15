@@ -53,6 +53,14 @@ class Lista:
             return actual
         return None
 
+    def __iter__(self):
+        actual = self.primero
+        i = 0
+        while i < self.largo:
+            yield actual
+            actual = actual.siguiente
+            i += 1
+
     def __repr__(self):
         return "Lista/ Primero {}".format(self.primero)
 
@@ -66,3 +74,18 @@ class Nodo:
     def __repr__(self):
         return "Nodo: {}".format(self.valor)
 
+'''
+a = Nodo(1)
+b = Nodo(12)
+c = Nodo(13)
+d = Nodo(14)
+
+lista = Lista()
+lista.add(a)
+lista.add(b)
+lista.add(c)
+lista.add(d)
+
+for nodo in lista:
+    print(nodo)
+'''

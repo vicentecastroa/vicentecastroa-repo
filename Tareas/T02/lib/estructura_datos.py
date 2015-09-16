@@ -53,6 +53,12 @@ class Lista:
             return actual
         return None
 
+    def __contains__(self, id):  # if id in lista
+        for nodo in self:
+            if nodo.valor.id == id:
+                return True
+        return False
+
     def __iter__(self):
         actual = self.primero
         i = 0
@@ -74,18 +80,22 @@ class Nodo:
     def __repr__(self):
         return "Nodo: {}".format(self.valor)
 
+
 '''
-a = Nodo(1)
-b = Nodo(12)
-c = Nodo(13)
-d = Nodo(14)
+a = Nodo(5)
+b = Nodo(6)
+c = Nodo(7)
+d = Nodo(8)
+e = Nodo(9)
 
 lista = Lista()
 lista.add(a)
 lista.add(b)
 lista.add(c)
 lista.add(d)
+lista.add(e)
 
-for nodo in lista:
-    print(nodo)
-'''
+if 10 not in lista:
+    print("no esta")
+else:
+    print("esta")'''

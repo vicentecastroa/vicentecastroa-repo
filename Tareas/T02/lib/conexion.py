@@ -7,18 +7,38 @@ class Conexion:
     def __init__(self, id, desde):
         self.id = id
         self.desde = desde
-        self.destinos = datos.Lista()
+        self.destinos = datos.Lista()  #sobreescribir contain
+
         self.tipo = None
         self.visitas = 0
 
     def agregar_destino(self, destino):
-        destino = datos.Nodo(destino)
-        self.destinos.add(destino)
-        self.visitas = 0
+        if destino not in self.destinos:
+            destino = datos.Nodo(destino)
+            self.destinos.add(destino)
+            self.visitas += 1
+        pass
 
     def get_tipo(self):
-        for i in range(self.destinos.largo):
-            pass
+        cantidad_destinos = self.destinos.largo
+        if cantidad_destinos == 1:
+            self.tipo = "dirigida"
+        if cantidad_destinos == 2:
+            self.tipo = "alternante"
+        if cantidad_destinos <=3:
+            self.tipo = "aleatoria"
+
+    def __contains__(self, id):  # if id in lista
+        for nodo in self:
+            if nodo.valor == id:
+                return True
+        return False
 
     def __repr__(self):
-        return "CONEXION desde {}".format(self.desde)
+        retorno = ""
+        id_desde = self.desde.id
+        for destino in self.destinos:
+            id_destino = destino.valor
+            retorno += "CONEXION ID{} ID{}\n".format(id_desde, id_destino)
+
+        return retorno

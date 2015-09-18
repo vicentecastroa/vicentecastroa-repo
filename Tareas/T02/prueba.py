@@ -2,12 +2,11 @@ __author__ = 'Vicente'
 
 
 class Hola:
-    def saludar(self):
-        print("hola como estas")
+    def __init__(self):
+        self.padre = "padre"
+        self.hijo = "hijo"
 
-a = Hola()
-def saludo_nuevo():
-    print("el pasto es pa las vacas")
-a.saludar()
-a.saludar = saludo_nuevo
-a.saludar()
+a = None
+
+if not a:
+    print("hola")

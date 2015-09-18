@@ -3,68 +3,50 @@ __author__ = 'Vicente'
 import lib.estructura_datos as datos
 
 
-class ListaPuertos:  # Se inicializa con el puerto inicial 0
+class ListaPuertos(datos.Lista):
     def __init__(self):
-        self.primero = None
-        self.ultimo = None
+        super().__init__()
+        self.ultimo_agregado = None
         self.cantidad_puertos = 0
 
     def agregar_puerto(self, puerto):
-        if not self.buscar_puerto(puerto.id):
-            self.ultimo.agregar_hijo(puerto)
-            puerto.agregar_padre(self.ultimo)
-            self.ultimo = puerto
+        nuevo_puerto = puerto
+        nodo_puerto = self.buscar_nodo(puerto.id)
+
+        if not self.primero:
+            self.primero = nuevo_puerto
+            self.ultimo_agregado = self.primero
+            self.cantidad_puertos += 1
+
+        elif not nodo_puerto:
+            self.ultimo_agregado.hijos.add(nuevo_puerto)  # agregar nuevo puerto como hijo del ultimo.
+            nuevo_puerto.padres.add(self.ultimo_agregado)  # agregar ultimo como padre del nuevo.
+            self.ultimo_agregado = nuevo_puerto
             self.cantidad_puertos += 1
 
         else:
-            id_puerto = puerto.id
-            puerto = self.buscar_puerto(id_puerto)
-            puerto.agregar_hijo(puerto)
-            puerto.agregar_padre(puerto)
-            self.ultimo = puerto
+            self.ultimo_agregado.hijos.add(nodo_puerto)
+            nodo_puerto.padres.add(self.ultimo_agregado)
+            self.ultimo_agregado = nodo_puerto
             self.cantidad_puertos += 1
 
-    def buscar_puerto(self, id):
-        actual = self.primero
-        if actual.id == id:
-            return actual
-        else:
-            for hijo in actual.hijos:
-                hijo.hijos.buscar_puerto(id)
-        return False
+    def recorrer_conexiones(self, conexiones_a_bummer):
+        pass
 
 
-class Puerto:
+class Puerto(datos.Nodo):
     def __init__(self, id):
-        self.id = id
-        self.visitas = 0
-        self.hijos = datos.Lista()
+        super().__init__()
         self.padres = datos.Lista()
+        self.hijos = datos.Lista()
+        self.id = id
         self.posibles_conexiones = 0
         self.futura_conexion = self.iter_conexiones()
         self.conexiones = datos.Lista()
 
-    def agregar_hijo(self, puerto_hijo):
-        puerto_hijo = datos.Nodo(puerto_hijo)
-        if self.hijos.largo == 0:
-            self.hijos.primero = puerto_hijo
-            self.hijos.cantidad_puertos = 1
-        elif puerto_hijo.valor.id not in self.hijos:
-            self.hijos.add(puerto_hijo)
-
-    def agregar_padre(self, puerto_padre):
-        puerto_padre = datos.Nodo(puerto_padre)
-        if self.padres.largo == 0:
-            self.padres.primero = puerto_padre
-            self.hijos.cantidad_puertos = puerto_padre
-        elif puerto_padre.valor.id not in self.padres:
-            self.padres.add(puerto_padre)
-
     def agregar_conexion(self, conexion):
         if conexion.id not in self.conexiones:
-            conexion = datos.Nodo(conexion)
             self.conexiones.add(conexion)
-            self.visitas += 1
 
     def iter_conexiones(self):
         conexiones = self.posibles_conexiones
@@ -72,7 +54,7 @@ class Puerto:
             for i in range(conexiones):
                 yield i
 
-    def decidir_conexion(self):  # hacer mas eficiente revisando el tipo de la conexion
+    def decidir_conexion(self):
         return next(self.futura_conexion)
 
     def __repr__(self):

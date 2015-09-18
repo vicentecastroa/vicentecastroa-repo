@@ -4,15 +4,20 @@ __author__ = 'Vicente'
 class Lista:
     def __init__(self):
         self.primero = None
+        self.ultimo_agregado = None
         self.largo = 0
 
     def add(self, nodo):
+        # si padres o hijos estan vacios, lo dejo como primero.
+        # si no, lo agrego  en siguiente. "hermano"
         if not self.primero:
             self.primero = nodo
+            self.ultimo_agregado = self.primero
         else:
-            actual = self.get_ultimo()
+            actual = self.ultimo_agregado
             actual.siguiente = nodo
             nodo.anterior = actual
+            self.ultimo_agregado = nodo
         self.largo += 1
 
     def remove(self, nodo):
@@ -45,41 +50,55 @@ class Lista:
         else:
             return actual
 
-    def get_ultimo(self):
-        if self.largo >= 1:
+    def get_by_id(self, id):
+        for nodo in self:
+            if nodo.id == id:
+                return nodo
+        return "No existe ese id"
+
+    def buscar_nodo(self, id):  # si es verdad, entregar nodo.
+        if self.primero:
             actual = self.primero
-            while actual.siguiente:
-                actual = actual.siguiente
-            return actual
-        return None
+            if actual.id == id:
+                return actual
+            else:
+                for hijo in actual.hijos:
+                    if hijo.id == id:
+                        return hijo
+                    nodo = hijo.hijos.buscar_nodo(id)
+                    if nodo:
+                        return nodo
+            return False
 
     def __contains__(self, id):  # if id in lista
         for nodo in self:
-            if nodo.valor.id == id:
+            if nodo.id == id:
                 return True
         return False
 
     def __iter__(self):
-        actual = self.primero
-        i = 0
-        while i < self.largo:
-            yield actual
-            actual = actual.siguiente
-            i += 1
+        if self.primero:
+            actual = self.primero
+            i = 0
+            while i < self.largo:
+                yield actual
+                if actual.siguiente:
+                    actual = actual.siguiente
+                i += 1
+        else:
+            return False
 
     def __repr__(self):
-        return "Lista/ Primero {}".format(self.primero)
+        retorno = ""
+        for nodo in self:
+            retorno = retorno + repr(nodo) + "\n"
+        return retorno
 
 
 class Nodo:
-    def __init__(self, valor):
-        self.valor = valor
+    def __init__(self):
         self.siguiente = None
         self.anterior = None
-
-    def __repr__(self):
-        return "Nodo: {}".format(self.valor)
-
 
 '''
 a = Nodo(5)
@@ -95,7 +114,5 @@ lista.add(c)
 lista.add(d)
 lista.add(e)
 
-if 10 not in lista:
-    print("no esta")
-else:
-    print("esta")'''
+for i in lista:
+    print(i)'''

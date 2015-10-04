@@ -1,21 +1,41 @@
 __author__ = 'Vicente'
+ # coding=UTF-8
+
+from ataques import Trident, Tomahawk, Napalm, Minuteman, Kamikaze, Paralizer, Ingenieros
 
 
 class Vehiculo:
 
     def __init__(self):
-        self.tamaÒo = None
+        self.size = (3, 3)
+        self.pos_actual = None
         self.resistencia = None
-        self.ataques = dict()
+        self.ataque = None
 
     def mover(self, direccion):
-        return None
+        direcciones = {"A": (-1, 0),
+                       "D": (1, 0),
+                       "W": (0, 1),
+                       "X": (0, -1),
+                       "Q": (-1, 1),
+                       "E": (1, 1),
+                       "Z": (-1, -1),
+                       "C": (1, -1),
+                       }
+        cambio = direcciones[direccion]
+        posicion_nueva = (self.pos_actual[0]+cambio[0], self.pos_actual[1]+cambio[1])
+        return posicion_nueva
 
     def cambiar_resistencia(self, cambio):
+        self.resistencia += cambio
+        return True
+
+    def atacar(self, posicion):
+
         return None
 
-    def atacar(self, ataque, posicion):
-        return None
+    def __repr__(self):
+        return "Bote"
 
 
 class VehiculoMar(Vehiculo):
@@ -30,31 +50,54 @@ class VehiculoAire(Vehiculo):
         super().__init__()
 
 
-class BarcoPequeÒo(VehiculoMar):
+class BarcoPequeno(VehiculoMar):
 
     def __init__(self):
         super().__init__()
+        self.size = (3, 1)
+        self.resistencia = 30
+        self.ataque = Minuteman()
+
+    def __repr__(self):
+        return "Barco Peque√±o"
 
 
 class BuqueGuerra(VehiculoMar):
 
     def __init__(self):
         super().__init__()
+        self.resistencia = 60
+        self.ataque = Tomahawk()
+
+    def __repr__(self):
+        return "Buque de Guerra"
 
 
 class Lancha(VehiculoMar):
 
     def __init__(self):
         super().__init__()
+        self.resistencia = 1
 
     def mover(self, posicion):
         return None
+
+    def __repr__(self):
+        return "Lancha"
 
 
 class Puerto(VehiculoMar):
 
     def __init__(self):
         super().__init__()
+        self.resistencia = 80
+        self.ataque = Ingenieros()
+
+    def mover(self, posicion):
+        return None
+
+    def __repr__(self):
+        return "Puerto"
 
 
 class Explorador(VehiculoAire):
@@ -62,15 +105,26 @@ class Explorador(VehiculoAire):
     def __init__(self):
         super().__init__()
 
+    def __repr__(self):
+        return "Avi√≥n Explorador"
 
-class Kamikaze(VehiculoAire):
+
+class KamikazeAvion(VehiculoAire):
 
     def __init__(self):
         super().__init__()
+        self.ataque = Kamikaze()
+
+    def __repr__(self):
+        return "Kamikaze IXXI"
 
 
 class Caza(VehiculoAire):
 
     def __init__(self):
         super().__init__()
+        self.ataque = Napalm()
+
+    def __repr__(self):
+        return "Avi√≥n Caza"
 

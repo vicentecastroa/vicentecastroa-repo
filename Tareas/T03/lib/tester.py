@@ -1,23 +1,17 @@
 __author__ = 'Vicente'
+# coding=UTF-8
+
+#import mapa, interfaz, vehiculos, ataques
+
+class TestMapa:
+
+    def test_posicion_manual(self):
+        return None
 
 
-coodenada = "A32112"
+def a():
+    b = 15
+    v = 16
+    return b, v
 
-print(coodenada[0])
-print(coodenada[1:])
-for i in range(10):
-    print(i+1)
-
-
-"""
-finalizar turno:
-            self.n_mapa += 1
-            self.historial[self.n_mapa] = lista_vehiculos
-            self.vehiculos_actual = lista_vehiculos
-
-            self.n_mapa += 1
-            self.historial[self.n_mapa] = lista_vehiculos
-            self.vehiculos_actual = lista_vehiculos
-
-"""
-
+print(a())

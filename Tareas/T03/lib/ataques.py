@@ -1,5 +1,5 @@
 __author__ = 'Vicente'
- # coding=UTF-8
+# coding=UTF-8
 
 
 class Ataque:
@@ -11,6 +11,7 @@ class Ataque:
         self.usado = False
         self.turnos_espera = 0
         self.espera = 1
+        self.coordenada_ataque = None
         pass
 
     def usar(self):
@@ -24,6 +25,15 @@ class Ataque:
                 self.usado = False
                 self.disponible = True
                 self.turnos_espera = 0
+
+    def celdas_ocupadas(self, posicion):
+            celdas = list()
+            for i in range(self.cobertura[0]):
+                x = posicion[0] + i
+                for j in range(self.cobertura[1]):
+                    y = posicion[1] + j
+                    celdas.append((x, y))
+            return celdas
 
 
 class Trident(Ataque):

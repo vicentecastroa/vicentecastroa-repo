@@ -1,25 +1,45 @@
 __author__ = 'Vicente'
- # coding=UTF-8
+# coding=UTF-8
 
 import string
-from vehiculos import Vehiculo
+from random import randint
+from vehiculos import BarcoPequeno, BuqueGuerra, Lancha, Puerto, Explorador, KamikazeAvion, Caza
+import celdas
 
 
 class Mapa:
-
-    def __init__(self, nombre=None):
-        self.nombre = nombre.upper()
+    def __init__(self):
         self.dimension = 15
         self.n_mapa = 0
         self.historial = {0: list()}
         self.grilla_actual = self.grilla_default()
         self.vehiculos_actual = list()
+        self.vehiculos_disponibles = None
 
     def grilla_default(self):
         grilla = [["_" for _ in range(self.dimension)] for _ in range(self.dimension)]
         return grilla
 
     def posicionar_random(self):
+        vehiculos = self.vehiculos_disponibles
+        for vehiculo in vehiculos.values():
+            while not vehiculo.pos_actual:
+                posicion = (randint(0, 14 - vehiculo.size[0]), randint(0, 14 - vehiculo.size[1]))
+                self.ubicar_elemento(vehiculo, posicion)
+        self.cerrar_mapa()
+        self.mostrar_mapa(1)
+
+    def posicionar_manual(self):
+        vehiculos = self.vehiculos_disponibles
+        for vehiculo in vehiculos.values():
+            while not vehiculo.pos_actual:
+                celda = None
+                while not celda:
+                    coordenada_ingresada = input("Ingrese coordenada para {}: ".format(vehiculo))
+                    celda = celdas.coord_to_index(coordenada_ingresada)
+                self.ubicar_elemento(vehiculo, celda)
+        self.cerrar_mapa()
+        self.mostrar_mapa(1)
         return True
 
     def cerrar_mapa(self):
@@ -27,20 +47,12 @@ class Mapa:
         self.historial[self.n_mapa] = self.vehiculos_actual
 
     def mostrar_mapa(self, turno):
-        numeros = list(map(lambda x: str(x+1), range(self.dimension)))
+        numeros = list(map(lambda x: str(x + 1), range(self.dimension)))
         grilla = self.grilla_default()
         for elemento in self.historial[turno]:
-            alto = elemento.size[0]
-            ancho = elemento.size[1]
-            try:
-                cord_x = elemento.pos_actual[0]
-                cord_y = elemento.pos_actual[1]
-                for i in range(alto):
-                        grilla[cord_y+i][cord_x] = "X"
-                        for j in range(ancho):
-                            grilla[cord_y+i][cord_x+j] = "X"
-            except TypeError:
-                pass
+            celdas_ocupadas = elemento.celdas_ocupadas(elemento.pos_actual)
+            for celda in celdas_ocupadas:
+                grilla[celda[0]][celda[1]] = elemento.id
         self.grilla_actual = grilla
         self.encabezado()
         for i in range(len(grilla)):
@@ -54,25 +66,23 @@ class Mapa:
         letras.insert(0, "__")
         print("________________MAPA {}_________________ \n".format(self.nombre))
 
-        for i in range(self.dimension+1):
+        for i in range(self.dimension + 1):
             if not i == self.dimension:
                 print(letras[i], end="    ")
             else:
                 print(letras[i])
 
     def ubicar_elemento(self, elemento, posicion):
-        try:
-            if self.check_espacio(elemento.size, posicion):
-                elemento.pos_actual = posicion
-                try:
-                    lista_vehiculos = [elemento for elemento in self.vehiculos_actual]
-                except TypeError:
-                    lista_vehiculos = list()
+        if self.check_espacio(elemento, posicion):
+            elemento.pos_actual = posicion
+            try:
+                lista_vehiculos = [elemento for elemento in self.vehiculos_actual]
+            except TypeError:
+                lista_vehiculos = list()
+            if elemento not in lista_vehiculos:
                 lista_vehiculos.append(elemento)
-                self.vehiculos_actual = lista_vehiculos
-                return True
-        except IndexError:
-            print("ERROR: Esta ubicando {} fuera del mapa".format(elemento))
+            self.vehiculos_actual = lista_vehiculos
+            return True
 
     def borrar_elemento(self, elemento):
         if elemento in self.vehiculos_actual:
@@ -81,65 +91,66 @@ class Mapa:
             self.vehiculos_actual = lista_vehiculos
             return True
 
-    def mover_elemento(self):
-        print("Seleccione un vehículo")
-        for i in range(len(self.vehiculos_actual)):
-            print("[{}] {}".format(i+1, self.vehiculos_actual[i]))
-        vehiculo = self.vehiculos_actual[input()-1]
-        print("Ha seleccionado {}".format(vehiculo))
-        direccion = input("""
-        Mover en dirección:
-        Q   W   E
-        A   -   D
-        Z   X   C
-        """).upper()
+    def mover_elemento(self, vehiculo):
+        if not isinstance(vehiculo, Lancha):
+            direccion = input("""
+            Mover en dirección:
+            Q   W   E
+            A   -   D
+            Z   X   C
+            """).upper()
+        if isinstance(vehiculo, Lancha):
+            direccion = None
+            while not direccion:
+                direccion = celdas.coord_to_index(input("     Ingrese coordenadas de destino:"))
+
         self.ubicar_elemento(vehiculo, vehiculo.mover(direccion))
 
-    def check_espacio(self, dimension, posicion):
-        alto = dimension[0]
-        ancho = dimension[1]
-        cord_x = posicion[0]
-        cord_y = posicion[1]
-        grilla = self.grilla_actual
-        for i in range(alto):
-            if grilla[cord_y+i][cord_x] == "X":
+    def check_espacio(self, elemento, posicion):
+        celdas_ocupadas = self.casillas_ocupadas()
+        celdas_nuevas = elemento.celdas_ocupadas(posicion)
+        for casilla in celdas_nuevas:
+            if casilla in celdas_ocupadas:
                 return False
-            for j in range(ancho):
-                if grilla[cord_y+i][cord_x+j] == "X":
-                    return False
+            if casilla[0] >= 15 or casilla[1] >= 15:
+                return False
         return True
+
+    def casillas_ocupadas(self):
+        vehiculos_puestos = self.vehiculos_actual
+        celdas_ocupadas = list()
+        for vehiculo in vehiculos_puestos:
+            for celda in vehiculo.celdas_ocupadas(vehiculo.pos_actual):
+                celdas_ocupadas.append(celda)
+        return celdas_ocupadas
+
+    def get_elemento(self, coordenada):
+        for vehiculo in self.vehiculos_actual:
+            for celda in vehiculo.celdas_ocupadas(vehiculo.pos_actual):
+                if coordenada == celda:
+                    return vehiculo
+        return None
 
     def __repr__(self):
         return "MAPA"
 
 
 class MapaAire(Mapa):
-
-    def __init__(self):
+    def __init__(self, nombre):
         super().__init__()
+        self.nombre = "AIRE jugador: {}".format(nombre)
+        self.vehiculos_disponibles = {"explorador": Explorador(),
+                                      "kamikaze": KamikazeAvion(),
+                                      "caza": Caza()
+                                      }
 
 
 class MapaMar(Mapa):
-
-    def __init__(self):
+    def __init__(self, nombre):
         super().__init__()
-
-
-"""
-if __name__ == '__main__':
-    bote = Vehiculo()
-    bote2 = Vehiculo()
-    mapa = Mapa("jugador 1")
-    mapa.ubicar_elemento(bote, (3, 3))
-    mapa.cerrar_mapa()
-    mapa.mostrar_mapa(1)
-    print(mapa.vehiculos_actual)
-    mapa.ubicar_elemento(bote2, (10, 10))
-    mapa.cerrar_mapa()
-    mapa.mostrar_mapa(2)
-    print(mapa.vehiculos_actual)
-    mapa.borrar_elemento(bote2)
-    mapa.cerrar_mapa()
-    mapa.mostrar_mapa(3)
-    print(mapa.vehiculos_actual)
-"""
+        self.nombre = "MAR jugador: {}".format(nombre)
+        self.vehiculos_disponibles = {"barco": BarcoPequeno(),
+                                      "buque": BuqueGuerra(),
+                                      "lancha": Lancha(),
+                                      "puerto": Puerto()
+                                      }

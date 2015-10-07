@@ -2,8 +2,8 @@ __author__ = 'Vicente'
 # coding=UTF-8
 
 from random import randint
-from ataques import Trident, Tomahawk, Napalm, Minuteman, Kamikaze, Paralizer, Ingenieros, Explorar
-from celdas import celdas_ocupadas
+from lib.ataques import Trident, Tomahawk, Napalm, Minuteman, Kamikaze, Paralizer, Ingenieros, Explorar
+from lib.celdas import celdas_ocupadas
 
 
 class Vehiculo:
@@ -45,10 +45,6 @@ class Vehiculo:
                 return False  # mató
         return True  # sigue vivo
 
-    def atacar(self):
-        # pedir posicion ataque
-        return None
-
     def menu(self):
         print("""
     [A] Atacar
@@ -63,6 +59,10 @@ class Vehiculo:
 
     def mostrarse(self):
         pass
+
+    def actualizar_ataques(self):
+        for ataque in self.ataques:
+            ataque.actualizar_disponibilidad()
 
 
 class VehiculoMar(Vehiculo):
@@ -81,7 +81,7 @@ class BarcoPequeno(VehiculoMar):
 
     def __init__(self):
         super().__init__((3, 1), 30, "B")
-        self.ataques = [Minuteman(), Paralizer()]
+        self.ataques = [Minuteman(), Paralizer(), Trident()]
 
     def __repr__(self):
         return "Barco Pequeño"
@@ -91,7 +91,7 @@ class BuqueGuerra(VehiculoMar):
 
     def __init__(self):
         super().__init__((2, 3), 60, "G")
-        self.ataques = [Tomahawk(), Paralizer()]
+        self.ataques = [Tomahawk(), Paralizer(), Trident()]
 
     def __repr__(self):
         return "Buque de Guerra"
@@ -102,15 +102,10 @@ class Lancha(VehiculoMar):
     def __init__(self):
         super().__init__((2, 1), 1, "L")
         self.resistencia = 1
+        self.ataques = [Trident()]
 
     def mover(self, posicion):
         return posicion
-
-    def menu(self):
-        print("""
-    [M] Mover
-    [V] Volver
-        """)
 
     def __repr__(self):
         return "Lancha"
@@ -145,7 +140,7 @@ class Explorador(VehiculoAire):
         super().__init__((2, 2), "", "E")
         self.paralizado = False
         self.turnos_paralizado = 0
-        self.ataques = Explorar()
+        self.ataques = [Explorar()]
 
     def atacado(self, ataque=None):
         self.paralizado = True
@@ -192,7 +187,7 @@ class Caza(VehiculoAire):
 
     def __init__(self):
         super().__init__((1, 1), "", "C")
-        self.ataque = Napalm()
+        self.ataques = [Napalm()]
 
     def __repr__(self):
         return "Avión Caza"

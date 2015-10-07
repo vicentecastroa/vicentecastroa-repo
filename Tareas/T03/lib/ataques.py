@@ -4,7 +4,8 @@ __author__ = 'Vicente'
 
 class Ataque:
 
-    def __init__(self, damage=None):
+    def __init__(self, nombre, damage=None):
+        self.nombre = nombre
         self.size = (1, 1)
         self.damage = damage
         self.disponible = True
@@ -26,84 +27,61 @@ class Ataque:
                 self.disponible = True
                 self.turnos_espera = 0
 
+    def __repr__(self):
+        return "{}".format(self.nombre)
+
+
 class Trident(Ataque):
 
     def __init__(self):
-        super().__init__(-5)
-        self.nombre = "Misil UGM-133 Trident II"
+        super().__init__("Misil UGM-133 Trident II", -5)
 
 
 class Tomahawk(Ataque):
 
     def __init__(self):
-        super().__init__(-5)
+        super().__init__("Misil de crucero BGM-109 Tomahawk", -5)
         self.size = (1, 15)
         self.espera = 3
-        self.nombre = "Misil de crucero BGM-109 Tomahawk"
-
-    def __repr__(self):
-        return "{}".format(self.nombre)
 
 
 class Napalm(Ataque):
 
     def __init__(self):
-        super().__init__(-5)
+        super().__init__("Napalm", -5)
         self.espera = 8
-        self.nombre = "Napalm"
-
-    def __repr__(self):
-        return "{}".format(self.nombre)
-
 
 class Minuteman(Ataque):
 
     def __init__(self):
-        super().__init__(-15)
+        super().__init__("Misil Balistico Intercontinental Minuteman III", -15)
         self.espera = 3
-        self.nombre = "Misil Balistico Intercontinental Minuteman III"
-
-    def __repr__(self):
-        return "{}".format(self.nombre)
 
 
 class Kamikaze(Ataque):
 
     def __init__(self):
-        super().__init__(-10000000)
-        self.nombre = "Kamikaze IXXI"
-
-    def __repr__(self):
-        return "{}".format(self.nombre)
+        super().__init__("Kamikaze IXXI", -10000000)
 
 
 class Paralizer(Ataque):
 
     def __init__(self):
-        super().__init__()
+        super().__init__("Massive Ordnance Air Blas Paralizer")
         self.size = (2, 1)
-        self.nombre = "Massive Ordnance Air Blas Paralizer"
-
-    def __repr__(self):
-        return "{}".format(self.nombre)
 
 
 class Ingenieros(Ataque):
 
     def __init__(self):
-        super().__init__(1)
-        self.nombre = "Kit Ingenieros"
-
-    def __repr__(self):
-        return "{}".format(self.nombre)
+        super().__init__("Kit Ingenieros", 1)
 
 
 class Explorar(Ataque):
 
     def __init__(self):
-        super().__init__()
+        super().__init__("Explorar")
         self.size = (3, 3)
-        self.nombre = "Explorar"
 
     def usar(self):
         pass

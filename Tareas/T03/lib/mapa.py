@@ -3,8 +3,8 @@ __author__ = 'Vicente'
 
 import string
 from random import randint
-from vehiculos import BarcoPequeno, BuqueGuerra, Lancha, Puerto, Explorador, KamikazeAvion, Caza
-import celdas
+from lib.vehiculos import BarcoPequeno, BuqueGuerra, Lancha, Puerto, Explorador, KamikazeAvion, Caza
+import lib.celdas as celdas
 
 
 class Mapa:
@@ -138,7 +138,7 @@ class Mapa:
             if exitos > 0:
                 return vehiculo, efectividad100
 
-        return False
+        return None, efectividad100
 
     def __repr__(self):
         return "MAPA"

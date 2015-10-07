@@ -1,9 +1,9 @@
 __author__ = 'Vicente'
 # coding=UTF-8
-import mapa
-import vehiculos
-import ataques
-import celdas
+import lib.mapa as mapa
+import lib.vehiculos as vehiculos
+import lib.ataques as ataques
+import lib.celdas as celdas
 
 
 class BaseTest:

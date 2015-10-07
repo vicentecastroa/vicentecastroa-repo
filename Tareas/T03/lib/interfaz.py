@@ -1,50 +1,13 @@
 __author__ = 'Vicente'
 # coding=UTF-8
 
-from mapa import MapaMar, MapaAire
-from ataques import Paralizer, Kamikaze, Tomahawk, Explorar
-from vehiculos import Explorador
+from lib.mapa import MapaMar, MapaAire
+from lib.ataques import Paralizer, Kamikaze, Tomahawk, Explorar
+from lib.vehiculos import Explorador
+from lib.jugadores import Computador
+import lib.celdas as celdas
 import time
 from random import randint
-import celdas
-
-
-class Jugador:
-
-    def __init__(self, nombre):
-        self.nombre = nombre
-        self.turno = 0
-        self.mapas_propios = {"A": MapaAire(self.nombre),
-                              "M": MapaMar(self.nombre)
-                              }
-        self.historial_ataques = list()
-        self.vivo = True
-        self.jugando = False
-
-    def finalizar_turno(self):
-        map(lambda mapa: mapa.cerrar_mapa(), self.mapas_propios.values())
-        for mapa in self.mapas_propios.values():
-            for vehiculo in mapa.vehiculos_actual:
-                for ataque in vehiculo.ataques:
-                    ataque.actualizar_disponibilidad()
-            mapa.mostrar_mapa(mapa.n_mapa)
-        self.turno += 1
-        self.jugando = False
-
-        print("Su turno ha finalizado \n\n\n")
-        return None
-
-    def volver_menu_principal(self):
-        return None
-
-    def __repr__(self):
-        return self.nombre.capitalize()
-
-
-class Computador(Jugador):
-
-    def __init__(self):
-        super().__init__("computador")
 
 
 class Interfaz:
@@ -120,9 +83,14 @@ class Interfaz:
         for i in range(len(mapa.vehiculos_actual)):
             vehiculo = mapa.vehiculos_actual[i]
             print("[{}] {} [res: {}]".format(i + 1, vehiculo, vehiculo.resistencia))
-        vehiculo = mapa.vehiculos_actual[int(input()) - 1]
-        print("Ha seleccionado {}".format(vehiculo))
-        return vehiculo, mapa
+        try:
+            vehiculo = mapa.vehiculos_actual[int(input()) - 1]
+            print("Ha seleccionado {}".format(vehiculo))
+            return vehiculo, mapa
+        except IndexError:
+            print("Opción ingresada no válida")
+        except ValueError:
+            print("Opción ingresada no válida")
 
     def menu_vehiculo(self, jugador, pasivo, vehiculo, mapa):
         print("""
@@ -146,9 +114,15 @@ class Interfaz:
             return None
 
     def menu_ataques(self, vehiculo):
-        vehiculo.menu_ataques()
-        opcion = int(input("").upper()) - 1
-        return vehiculo.ataques[opcion]
+        try:
+            vehiculo.menu_ataques()
+            opcion = int(input("").upper()) - 1
+            return vehiculo.ataques[opcion]
+        except IndexError:
+            print("Opción ingresada no válida")
+
+        except TypeError:
+            print("Ingresar el número correspondiente")
 
     def set_ataque(self, atacante, defensor, ataque):
         ataque = ataque
@@ -163,16 +137,16 @@ class Interfaz:
             if not isinstance(ataque, Kamikaze):
                 print("Atacará con {} [rango: {}] [daño: {}]".format(ataque, ataque.size, ataque.damage))
             if isinstance(ataque, Kamikaze):
-                print("Realizará un ataque kamikaze. Su avión se destruirá luego de atacar")
+                print("Realizará un ataque kamikaze. Su avión se destruirá si acerta al objetivo")
             coordenadas = input("Ingrese coordenadas: ")
             coordenada_ataque = None
             while not coordenada_ataque:
                 coordenada_ataque = celdas.coord_to_index(coordenadas)
                 ataque.coordenada_ataque = coordenada_ataque
             if isinstance(mapa_enemigo, MapaMar):
-                return self.atacar_mar(atacante, defensor, ataque, mapa_enemigo)
+                return self.atacar_mar(atacante, ataque, mapa_enemigo)
             elif isinstance(mapa_enemigo, MapaAire):
-                return self.atacar_aire(atacante, ataque, mapa_enemigo)
+                return self.atacar_aire(atacante, mapa_enemigo)
 
     def atacar_mar(self, atacante, ataque, mapa):
         exitos = list()
@@ -191,7 +165,11 @@ class Interfaz:
                 else:
                     print("Ataque exitoso: {}".format(celdas.index_to_coord(celda)))
         ataque.usar()
-        atacante.historial_ataques.append((atacante.turno, ataque, ataque.coordenada_ataque, exito))
+        atacante.historial_ataques.append((atacante.turno,
+                                           ataque,
+                                           celdas.index_to_coord(ataque.coordenada_ataque),
+                                           exito
+                                           ))
 
     def atacar_aire(self, atacante, ataque, mapa):
         resultado_ataque = mapa.get_elemento(ataque.coordenada_ataque, ataque.size)
@@ -202,10 +180,9 @@ class Interfaz:
             exito = "Si"
         ataque.usar()
         atacante.historial_ataques.append((atacante.turno, ataque, ataque.coordenada_ataque, exito))
-        pass
 
-    def explorar(self,jugador, vehiculo, defensor):
-        ataque = vehiculo.ataques
+    def explorar(self, jugador, vehiculo, defensor):
+        ataque = vehiculo.ataques[0]
         coordenadas = input("Ingrese coordenadas: ")
         coordenada_ataque = None
         while not coordenada_ataque:
@@ -213,13 +190,11 @@ class Interfaz:
             ataque.coordenada_ataque = coordenada_ataque
         self.atacar_mar(jugador, ataque, defensor.mapas_propios["M"])
 
-
-
     def reparar(self, jugador, puerto):
         print("REPARACIÓN VEHÍCULO")
         resultado = self.mostrar_vehiculos(jugador)
         vehiculo_sel = resultado[0]
-        vehiculo_sel.cambiar_resistencia(puerto.ataque.damage)
+        vehiculo_sel.atacado(puerto.ataques[0].damage)
 
     def det_jugando(self, lista_jugadores):
         activo = None
@@ -242,48 +217,6 @@ class Interfaz:
         return muerto, vivo
 
 
-if __name__ == '__main__':
-    print("    BIENVENIDO AL BATTLESHIP")
-
-    cant_jugadores = input("""
-    Cantidad de jugadores:
-    [1] 1 Jugador
-    [2] 2 Jugadores
-    """)
-    jugador_1 = Jugador(input("Nombre jugador 1: ").upper())
-    if cant_jugadores == "2":
-        jugador_2 = Jugador(input("Nombre jugador 2: ").upper())
-    else:
-        jugador_2 = Computador()
-
-    interfaz = Interfaz(jugador_1, jugador_2)
-    interfaz.crear_mapas()
-
-    print("\n\n\n    COMIENZA EL JUEGO\n")
-    jugador = interfaz.sorteo()
-    jugador.jugando = True
-    lista_jugadores = [jugador_1, jugador_2]
-
-    while jugador_1.vivo and jugador_2.vivo:
-        jugadores = interfaz.det_jugando(lista_jugadores)
-        activo = jugadores[0]
-        pasivo = jugadores[1]
-        print("Es el turno de {}".format(activo))
-        while activo.jugando:
-            opcion = interfaz.menu_principal()
-            if opcion == "V":
-                seleccion = interfaz.mostrar_vehiculos(jugador_1)
-                vehiculo_sel = seleccion[0]
-                mapa_sel = seleccion[1]
-                interfaz.menu_vehiculo(jugador_1, jugador_2, vehiculo_sel, mapa_sel)
-            if opcion == "R":
-                interfaz.radar(activo)
-
-        activo.jugando = False
-        pasivo.jugando = True
-
-    veredicto = interfaz.det_muerto(lista_jugadores)
-    print("Enhorabuena {}! A derrotado a {}".format(veredicto[1], veredicto[2]))
-    print("Estadísticas del juego")
-
+    def estadisticas(self):
+        pass
 

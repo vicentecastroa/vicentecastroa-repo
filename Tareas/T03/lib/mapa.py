@@ -50,8 +50,7 @@ class Mapa:
         numeros = list(map(lambda x: str(x + 1), range(self.dimension)))
         grilla = self.grilla_default()
         for elemento in self.historial[turno]:
-            celdas_ocupadas = elemento.celdas_ocupadas(elemento.pos_actual)
-            for celda in celdas_ocupadas:
+            for celda in celdas.celdas_ocupadas(elemento.pos_actual, elemento.size):
                 grilla[celda[0]][celda[1]] = elemento.id
         self.grilla_actual = grilla
         self.encabezado()
@@ -83,6 +82,7 @@ class Mapa:
                 lista_vehiculos.append(elemento)
             self.vehiculos_actual = lista_vehiculos
             return True
+        return False
 
     def borrar_elemento(self, elemento):
         if elemento in self.vehiculos_actual:
@@ -103,12 +103,11 @@ class Mapa:
             direccion = None
             while not direccion:
                 direccion = celdas.coord_to_index(input("     Ingrese coordenadas de destino:"))
-
         self.ubicar_elemento(vehiculo, vehiculo.mover(direccion))
 
     def check_espacio(self, elemento, posicion):
         celdas_ocupadas = self.casillas_ocupadas()
-        celdas_nuevas = elemento.celdas_ocupadas(posicion)
+        celdas_nuevas = celdas.celdas_ocupadas(posicion, elemento.size)
         for casilla in celdas_nuevas:
             if casilla in celdas_ocupadas:
                 return False
@@ -120,16 +119,26 @@ class Mapa:
         vehiculos_puestos = self.vehiculos_actual
         celdas_ocupadas = list()
         for vehiculo in vehiculos_puestos:
-            for celda in vehiculo.celdas_ocupadas(vehiculo.pos_actual):
+            for celda in celdas.celdas_ocupadas(vehiculo.pos_actual, vehiculo.size):
                 celdas_ocupadas.append(celda)
         return celdas_ocupadas
 
-    def get_elemento(self, coordenada):
+    def get_elemento(self, coordenada, espacio=(1, 1)):
+        cobertura = celdas.celdas_ocupadas(coordenada, espacio)
         for vehiculo in self.vehiculos_actual:
-            for celda in vehiculo.celdas_ocupadas(vehiculo.pos_actual):
-                if coordenada == celda:
-                    return vehiculo
-        return None
+            exitos = 0
+            efectividad100 = False
+            ocupadas = celdas.celdas_ocupadas(vehiculo.pos_actual, vehiculo.size)
+            for celda_buscada in cobertura:
+                if celda_buscada in ocupadas:
+                    exitos += 1
+                    if exitos == len(cobertura):
+                        efectividad100 = True
+
+            if exitos > 0:
+                return vehiculo, efectividad100
+
+        return False
 
     def __repr__(self):
         return "MAPA"
@@ -154,3 +163,11 @@ class MapaMar(Mapa):
                                       "lancha": Lancha(),
                                       "puerto": Puerto()
                                       }
+
+mapa = MapaMar("nombre")
+bote = BarcoPequeno()
+bote.pos_actual = (1, 1)
+mapa.vehiculos_actual.append(bote)
+
+resultado = mapa.get_elemento((10, 10))
+print(resultado)

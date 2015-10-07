@@ -5,12 +5,12 @@ __author__ = 'Vicente'
 class Ataque:
 
     def __init__(self, damage=None):
-        self.cobertura = (1, 1)
+        self.size = (1, 1)
         self.damage = damage
         self.disponible = True
         self.usado = False
         self.turnos_espera = 0
-        self.espera = 1
+        self.espera = 0
         self.coordenada_ataque = None
         pass
 
@@ -21,20 +21,10 @@ class Ataque:
     def actualizar_disponibilidad(self):
         if self.usado:
             self.turnos_espera += 1
-            if self.turnos_espera >= self.turnos_espera:
+            if self.turnos_espera > self.espera:
                 self.usado = False
                 self.disponible = True
                 self.turnos_espera = 0
-
-    def celdas_ocupadas(self, posicion):
-            celdas = list()
-            for i in range(self.cobertura[0]):
-                x = posicion[0] + i
-                for j in range(self.cobertura[1]):
-                    y = posicion[1] + j
-                    celdas.append((x, y))
-            return celdas
-
 
 class Trident(Ataque):
 
@@ -47,7 +37,7 @@ class Tomahawk(Ataque):
 
     def __init__(self):
         super().__init__(-5)
-        self.cobertura = (1, 15)
+        self.size = (1, 15)
         self.espera = 3
         self.nombre = "Misil de crucero BGM-109 Tomahawk"
 
@@ -69,7 +59,7 @@ class Napalm(Ataque):
 class Minuteman(Ataque):
 
     def __init__(self):
-        super().__init__(-5)
+        super().__init__(-15)
         self.espera = 3
         self.nombre = "Misil Balistico Intercontinental Minuteman III"
 
@@ -80,7 +70,7 @@ class Minuteman(Ataque):
 class Kamikaze(Ataque):
 
     def __init__(self):
-        super().__init__(-10000)
+        super().__init__(-10000000)
         self.nombre = "Kamikaze IXXI"
 
     def __repr__(self):
@@ -91,6 +81,7 @@ class Paralizer(Ataque):
 
     def __init__(self):
         super().__init__()
+        self.size = (2, 1)
         self.nombre = "Massive Ordnance Air Blas Paralizer"
 
     def __repr__(self):
@@ -105,3 +96,14 @@ class Ingenieros(Ataque):
 
     def __repr__(self):
         return "{}".format(self.nombre)
+
+
+class Explorar(Ataque):
+
+    def __init__(self):
+        super().__init__()
+        self.size = (3, 3)
+        self.nombre = "Explorar"
+
+    def usar(self):
+        pass

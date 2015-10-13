@@ -75,11 +75,10 @@ class Simulacion:
                 self.cola_espera.append(jugador_nuevo)
                 print("[COLA] Se sumo {} a la cola en el tiempo {}".format(jugador_nuevo, self.tiempo_simulacion))
 
-            
 
-
-
-
+            if self.tiempo_simulacion == self.mesa.tiempo_partido:
+                # Se termino el partido. Ver el ganador, el primero en la fila entra a la mesa.
+                
 
 
 if __name__ == '__main__':

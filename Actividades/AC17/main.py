@@ -77,8 +77,10 @@ class Simulacion:
 
 
             if self.tiempo_simulacion == self.mesa.tiempo_partido:
-                # Se termino el partido. Ver el ganador, el primero en la fila entra a la mesa.
-                
+                # Se termino el partido.
+                # ver el ganador
+                # cambiar a los jugadores. sale el perdedor, entra el primero de la fila
+                # 
 
 
 if __name__ == '__main__':
